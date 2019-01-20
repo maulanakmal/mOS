@@ -1,6 +1,6 @@
-SOURCES=boot.o
+SOURCES=boot.o main.o
 
-CFLAGS=
+CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector
 LDFLAGS=-Tlink.ld
 ASFLAGS=-felf
 
