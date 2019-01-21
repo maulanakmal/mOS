@@ -1,7 +1,7 @@
 SOURCES=boot.o main.o
 
-CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector
-LDFLAGS=-Tlink.ld
+CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector -m32
+LDFLAGS=-Tlink.ld -melf_i386
 ASFLAGS=-felf
 
 all: $(SOURCES) link
