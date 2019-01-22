@@ -12,7 +12,7 @@ void outb(u16int port, u8int value);
 u8int inb(u16int port);
 u16int inw(u16int port);
 
-void memset(void *ptr, u32int value, u32int num);
-void memcpy(void *dest, void *src, u32int num);
+void memset(u8int *ptr, u8int value, u32int num);
+void memcpy(u8int *dest, const u8int *src, u32int num);
 
 #endif

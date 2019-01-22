@@ -15,3 +15,17 @@ u16int inw(u16int port) {
     asm volatile("inw %1, %0" : "=a" (ret) : "dN" (port));
     return ret;
 }
+
+void memset(u8int *ptr, u8int value, u32int num) {
+    u32int i = 0;
+    for (i = 0; i < num; i++) {
+        ptr[i] = value;
+    }
+}
+
+void memcpy(u8int *dest, const u8int *src, u32int num) {
+    u32int i = 0;
+    for (i = 0; i < num; i++) {
+        dest[i] = src[i];
+    }
+}
