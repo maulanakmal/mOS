@@ -30,10 +30,14 @@ struct idt_entry_struct {
     u16int base_high;
 } __attribute__((packed));
 
+typedef struct idt_entry_struct idt_entry_t;
+
 struct idt_ptr_struct {
     u16int limit;
     u32int base;
 } __attribute__((packed));
+
+typedef struct idt_ptr_struct idt_ptr_t;
 
 extern void isr0();
 extern void isr1();
