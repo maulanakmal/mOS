@@ -71,6 +71,8 @@ static void init_idt() {
     idt_set_gate(0, (u32int)isr29, 0x08, 0x8E);
     idt_set_gate(0, (u32int)isr30, 0x08, 0x8E);
     idt_set_gate(0, (u32int)isr31, 0x08, 0x8E);
+
+    idt_flush((u32int)&idt_ptr);
 }
 
 static void gdt_set_gate(s32int num, u32int base, u32int limit, u8int access,
@@ -80,7 +82,7 @@ static void gdt_set_gate(s32int num, u32int base, u32int limit, u8int access,
     gdt_entries[num].base_high = (base >> 24) & 0xFF;
 
     gdt_entries[num].limit_low = (limit & 0xFFFF);
-    gdt_entries[num].granularity = (limit >> 16) & 0xFF;
+    gdt_entries[num].granularity = (limit >> 16) & 0x0F;
 
     gdt_entries[num].granularity |= gran & 0xF0;
     gdt_entries[num].access = access;
@@ -90,5 +92,6 @@ static void idt_set_gate(u8int num, u32int base, u16int sel, u8int flags) {
     idt_entries[num].base_low = base & 0xFFFF;
     idt_entries[num].base_high = (base >> 16) & 0xFFFF;
     idt_entries[num].sel = sel;
+    idt_entries[num].always0 = 0;
     idt_entries[num].flags = flags /* | 0x60 */; // for user mode
 }
