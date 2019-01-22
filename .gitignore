@@ -52,5 +52,5 @@ Mkfile.old
 dkms.conf
 
 */kernel
-bochsout.txt
+logs/*
 floppy.img
