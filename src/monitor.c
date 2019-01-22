@@ -86,3 +86,38 @@ void monitor_write(char *c) {
         monitor_put(c[i++]);
     }
 }
+
+void monitor_write_dec(u32int n) {
+    char c[32];
+    u8int i = 0;
+    while( n > 0 ){
+        c[i] = '0' + (n%10);
+        n = n / 10;
+        i++;
+    } 
+    while (i >= 0) {
+        monitor_put(c[i]);
+        i--;
+    }
+}
+
+void monitor_write_hex(u32int n) {
+  int tmp;
+  char noZeroes = 1;
+
+  monitor_write("0x");
+
+  int i;
+  for (i = 28; i >= 0; i -= 4)
+  {
+    tmp = (n >> i) & 0xF;
+    if (tmp == 0 && noZeroes != 0)
+      continue;
+
+    noZeroes = 0;
+    if (tmp >= 0xA)
+      monitor_put (tmp-0xA+'a' );
+    else
+      monitor_put( tmp+'0' );
+  }
+}
