@@ -1,5 +1,9 @@
 #include "monitor.h"
 
+u16int *video_memory = (u16int *)0xB8000;
+u8int cursor_x = 0;
+u8int cursor_y = 0;
+
 static void move_cursor() {
     u16int cursor_location = cursor_y * 80 + cursor_x;
     outb(0x3D4, 14);
@@ -58,4 +62,26 @@ void monitor_put(char c) {
     }
     scroll();
     move_cursor();
+}
+
+
+void monitor_clear() {
+    u8int attribute_byte = (0 << 4) | (15 & 0x0F);
+    u16int blank = 0x20 | (attribute_byte << 8);
+
+    int i;
+    for (i = 0; i < 80*25; i++) {
+        video_memory[i] = blank;
+    }
+
+    cursor_x = 0;
+    cursor_y = 0;
+    move_cursor();
+}
+
+void monitor_write(char *c) {
+    int i = 0;
+    while (c[i]) {
+        monitor_put(c[i++]);
+    }
 }
