@@ -11,14 +11,14 @@ struct gdt_entry_struct {
     u8int granularity;
     u8int base_high;
 } __attribute__((packed));
-
 typedef struct gdt_entry_struct gdt_entry_t;
 
 struct gdt_ptr_struct {
     u16int limit;
     u32int base;
 } __attribute__((packed));
-
 typedef struct gdt_ptr_struct gdt_ptr_t;
+
+void init_gdt();
 
 #endif
