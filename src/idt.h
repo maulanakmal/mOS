@@ -53,4 +53,6 @@ extern void isr29();
 extern void isr30();
 extern void isr31();
 
+void init_idt();
+
 #endif
