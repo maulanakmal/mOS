@@ -10,11 +10,6 @@ static void gdt_set_gate(s32int, u32int, u32int, u8int, u8int);
 gdt_entry_t gdt_entries[5];
 gdt_ptr_t gdt_ptr;
 
-void init_descriptor_tables() {
-    init_gdt();
-    init_idt();
-}
-
 
 static void init_gdt() {
     gdt_ptr.limit = (sizeof(gdt_entry_t) * 5) - 1;

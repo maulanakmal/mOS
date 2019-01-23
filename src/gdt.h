@@ -21,6 +21,4 @@ struct gdt_ptr_struct {
 
 typedef struct gdt_ptr_struct gdt_ptr_t;
 
-void init_descriptor_tables();
-
 #endif
