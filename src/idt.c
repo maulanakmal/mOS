@@ -80,8 +80,6 @@ void init_idt() {
     idt_set_gate(47, (u32int)irq15, 0x08, 0x8E);
 
     idt_flush((u32int)&idt_ptr);
-
-    monitor_write("\nidt flushed");
 }
 
 static void idt_set_gate(u8int num, u32int base, u16int sel, u8int flags) {
