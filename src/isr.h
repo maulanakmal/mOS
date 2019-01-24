@@ -12,4 +12,9 @@ typedef struct registers {
 
 void isr_handler(registers_t regs);
 
+void isr_handler(registers_t regs);
+
+typedef void (*isr_t)(registers_t);
+void register_interrupt_handler(u8int n, isr_t handler);
+
 #endif
