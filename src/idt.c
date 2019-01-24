@@ -1,6 +1,5 @@
 #include "common.h"
 #include "idt.h"
-#include "monitor.h"
 
 
 extern void idt_flush(u32int);
