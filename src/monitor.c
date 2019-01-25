@@ -87,18 +87,31 @@ void monitor_write(char *c) {
     }
 }
 
-void monitor_write_dec(u32int n) {
-    char c[32];
-    u8int i = 0;
-    while( n > 0 ){
-        c[i] = '0' + (n%10);
-        n = n / 10;
-        i++;
-    } 
-    while (i >= 0) {
-        monitor_put(c[i]);
-        i--;
-    }
+void monitor_write_dec(u32int n)
+{
+  if (n == 0)
+  {
+    monitor_put('0');
+    return;
+  }
+
+  u32int acc = n;
+  char c[32];
+  int i = 0;
+  while (acc > 0)
+  {
+      c[i] = '0' + acc%10;
+      acc /= 10;
+      i++;
+  }
+  c[i] = 0;
+
+  char c2[32];
+  c2[i--] = 0;
+  int j = 0;
+  while(i >= 0)
+    c2[i--] = c[j++];
+  monitor_write(c2);
 }
 
 void monitor_write_hex(u32int n) {
