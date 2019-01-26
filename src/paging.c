@@ -1,10 +1,10 @@
 #include "paging.h"
 #include "kheap.h"
 
+extern u32int placement_address;
+
 u32int *frames;
 u32int nframes;
-
-extern u32int placement_address;
 
 page_directory_t *kernel_directory = 0;
 page_directory_t *current_directory = 0;
@@ -16,21 +16,21 @@ static void set_frame(u32int frame_addr) {
     u32int frame = frame_addr/0x1000;
     u32int idx = INDEX_FROM_BIT(frame);
     u32int off = OFFSET_FROM_BIT(frame);
-    frame[idx] |= (0x1 << off);
+    frames[idx] |= (0x1 << off);
 }
 
 static void clear_frame(u32int frame_addr) {
     u32int frame = frame_addr/0x1000;
     u32int idx = INDEX_FROM_BIT(frame);
     u32int off = OFFSET_FROM_BIT(frame);
-    frame[idx] &= ~(0x1 << off);
+    frames[idx] &= ~(0x1 << off);
 }
 
 static u32int test_frame(u32int frame_addr) {
     u32int frame = frame_addr/0x1000;
     u32int idx = INDEX_FROM_BIT(frame);
     u32int off = OFFSET_FROM_BIT(frame);
-    return (frame[idx] & (0x1 << off);
+    return (frames[idx] & (0x1 << off));
 }
 
 static u32int first_frame() {
@@ -55,12 +55,12 @@ void alloc_frame(page_t *page, int is_kernel, int is_writeable) {
         u32int idx = first_frame();
         if( idx == (u32int)-1) {
             PANIC("No free frames!");
-            set_frame(idx*0x1000);
-            page->present = 1;
-            page->rw = (is_writeable)?1:0;
-            page->user = (is_kernel)?0:1;
-            page->frame = idx;
         }
+        set_frame(idx*0x1000);
+        page->present = 1;
+        page->rw = (is_writeable)?1:0;
+        page->user = (is_kernel)?0:1;
+        page->frame = idx;
     }
 }
 
@@ -92,6 +92,8 @@ void init_paging() {
         i += 0x1000;
     }
 
+    register_interrupt_handler(14, page_fault);
+
     switch_page_directory(kernel_directory);
 
 }
@@ -106,19 +108,19 @@ void switch_page_directory(page_directory_t *dir) {
 }
 
 
-void page_t *get_page(u32int address, int make, page_directory_t *dir) {
+page_t *get_page(u32int address, int make, page_directory_t *dir) {
     address /= 0x1000;
 
     u32int table_idx = address/1024;
-    if(dir->tables[idx]) {
+    if(dir->tables[table_idx]) {
         return &dir->tables[table_idx]->pages[address%1024];
     }
     else if(make){
         u32int tmp;
-        dir->tables[table_idx] = (page_table_t*)kamlloc_ap(sizeof(page_table_t), &tmp);
+        dir->tables[table_idx] = (page_table_t*)kmalloc_ap(sizeof(page_table_t), &tmp);
         memset(dir->tables[table_idx], 0, 0x1000);
-        dir->tables_physical[table_idx] = idx | 0x7;
-        return &dir->tables[tables_idx]->pages[address%1024];
+        dir->tables_physical[table_idx] = tmp | 0x7;
+        return &dir->tables[table_idx]->pages[address%1024];
     }else{
         return 0;
     }
