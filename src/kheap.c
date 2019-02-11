@@ -232,3 +232,64 @@ void* alloc(u32int size, u8int page_align, heap_t* heap) {
     return (void*)((u32int)block_header + sizeof(header_t));
 
 }
+
+void free (void* p, heap_t* heap) {
+    if (p == 0)
+        return;
+
+    header_t* header = (header_t*)((u32int)p - sizeof(header_t));
+    footer_t* footer = (footer_t*)((u32int)header +  header->size - sizeof(footer_t));
+
+    ASSERT(header->magic == HEAP_MAGIC);
+    ASSERT(footer->magic == HEAP_MAGIC);
+
+    header->is_hole = 1;
+
+    char do_add = 1;
+
+    footer_t* test_footer = (footer_t*)((u32int)header - sizeof(footer_t));
+    if (test_footer->magic == HEAP_MAGIC && test_footer->header->is_hole == 1) {
+        u32int cache_size = header->size;
+        header = test_footer->header;
+        footer->header = header;
+        header->size += cache_size;
+        do_add = 0;
+    }
+
+    header_t* test_header = (header_t*)((u32int)footer + sizeof(footer_t));
+    if (test_header->magic == HEAP_MAGIC && test_header->is_hole) {
+        header->size += test_header->size;
+        test_footer = (footer_t*)((u32int)test_header + test_header->size - sizeof(footer_t));
+        footer = test_footer;
+
+        u32int iterator = 0;
+        while ((iterator < heap->index.size) && (lookup_ordered_array(iterator, &heap->index) != test_header))
+            iterator++;
+
+        ASSERT(iterator < heap->index.size);
+        
+        remove_ordered_array(iterator, &heap->index);
+    }
+
+    if ((u32int)footer + sizeof(footer_t) == heap->end_address) {
+        u32int old_length = heap->end_address - heap->start_address;
+        u32int new_length = contract((u32int)header - heap->start_address, heap);
+
+        if (header->size - (old_length - new_length) > 0) {
+            header->size -= (old_length - new_length);
+            footer = (footer_t*)((u32int)header + header->size - sizeof(footer_t));
+            footer->magic = HEAP_MAGIC;
+            footer->header = header;
+        }
+        else {
+            u32int iterator = 0;
+            while ((iterator < heap->index.size) && (lookup_ordered_array(iterator, &heap->index) != (void*)test_header))
+                iterator++;
+            if (iterator < heap->index.size)
+                remove_ordered_array(iterator, &heap->index);
+        }
+    }
+
+    if (do_add == 1)
+        insert_ordered_array((void*)header, &heap->index);
+}
