@@ -119,7 +119,7 @@ static u32int contract(u32int new_size, heap_t* heap) {
     
     u32int old_size = heap->end_address - heap->start_address;
     u32int i = old_size - 0x1000;
-    while (i < new_size) {
+    while (i > new_size) {
         free_frame(get_page(heap->start_address + i, 0, kernel_directory));
         i -= 0x1000;
     }
